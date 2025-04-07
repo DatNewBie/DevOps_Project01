@@ -9,7 +9,11 @@ pipeline {
 
                     junit '**/target/surefire-reports/TEST-*.xml'
 
-                    publishCoverage adapters: [jacocoAdapter('**/target/site/jacoco/jacoco.xml')]
+                    recordCoverage(
+                        aggregating: true,
+                        glob: '**/target/site/jacoco/jacoco.xml'
+                    )    
+
                 }
             }
         }

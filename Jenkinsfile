@@ -5,18 +5,17 @@ pipeline {
         stage('Test') {
             steps {
                 script {
-                    sh 'mvn clean verify'
+                    // Chạy Maven command để test và tạo báo cáo coverage
+                    sh 'mvn clean test'
 
-                    junit '**/target/surefire-reports/TEST-*.xml'
-
-                    jacoco(
-                        execPattern: '**/target/jacoco.exec',
-                        classPattern: '**/target/classes',
-                        sourcePattern: '**/src/main/java',
-                        inclusionPattern: '**/*',
-                        exclusionPattern: '**/test/**'
+                    // Ghi nhận kết quả coverage
+                    recordCoverage(
+                        aggregating: true,
+                        glob: '**/target/site/coverage/coverage.xml'  // Đảm bảo file XML báo cáo coverage nằm đúng vị trí
                     )
 
+                    // Đảm bảo JUnit results
+                    junit '**/target/test-classes/testng*.xml'  // Đảm bảo file junit nằm ở đúng đường dẫn
                 }
             }
         }
@@ -24,8 +23,7 @@ pipeline {
         stage('Build') {
             steps {
                 script {
-                    sh 'mvn package' 
-
+                    sh 'mvn package'
                     archiveArtifacts 'target/*.jar'
                 }
             }

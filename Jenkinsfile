@@ -9,10 +9,13 @@ pipeline {
 
                     junit '**/target/surefire-reports/TEST-*.xml'
 
-                    recordCoverage(
-                        aggregating: true,
-                        glob: '**/target/site/jacoco/jacoco.xml'
-                    )    
+                    jacoco(
+                        execPattern: '**/target/jacoco.exec',
+                        classPattern: '**/target/classes',
+                        sourcePattern: '**/src/main/java',
+                        inclusionPattern: '**/*',
+                        exclusionPattern: '**/test/**'
+                    )
 
                 }
             }

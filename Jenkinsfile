@@ -5,9 +5,7 @@ pipeline {
         stage('Test') {
             steps {
                 script {
-                    sh 'mvn clean install'
-                    
-                    sh 'mvn clean test jacoco:report'
+                    sh 'mvn clean verify'
 
                     junit '**/test-results.xml' 
 

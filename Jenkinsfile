@@ -7,7 +7,7 @@ pipeline {
                 script {
                     sh 'mvn clean verify'
 
-                    junit '**/test-results.xml' 
+                    junit '**/target/surefire-reports/TEST-*.xml'
 
                     publishCoverage adapters: [jacocoAdapter('**/target/site/jacoco/jacoco.xml')]
                 }

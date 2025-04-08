@@ -6,9 +6,9 @@ pipeline {
             steps {
                 script {
                     // Chạy Maven command để test và tạo báo cáo coverage
-                    sh 'mvn clean test'
+                    sh 'mvn test'
 
-                    recordCoverage(tools: [cobertura(glob: '**/target/site/coverage/coverage.xml')])
+                    recordCoverage(tools: [[parser: 'JACOCO']])
 
                     // Đảm bảo JUnit results
                     junit '**/target/test-classes/testng*.xml'  // Đảm bảo file junit nằm ở đúng đường dẫn

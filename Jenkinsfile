@@ -5,7 +5,7 @@ pipeline {
         stage('Test') {
             steps {
                 script {
-                    sh 'mvn clean test'
+                    sh 'mvn clean verify'
 
                     recordCoverage(tools: [[parser: 'JACOCO']])
                 }

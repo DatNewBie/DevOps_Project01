@@ -16,7 +16,8 @@ pipeline {
             steps {
                 script {
                     sh 'mvn package'
-                    archiveArtifacts 'target/*.jar'
+                    archiveArtifacts '**/target/*.jar'
+
                 }
             }
         }

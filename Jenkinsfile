@@ -5,8 +5,7 @@ pipeline {
         stage('Test') {
             steps {
                 script {
-                    // Chạy Maven command để test và tạo báo cáo coverage
-                    sh 'mvn clean test jacoco:report'
+                    sh 'mvn clean test'
 
                     recordCoverage(tools: [[parser: 'JACOCO']])
                 }

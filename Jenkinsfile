@@ -7,7 +7,7 @@ pipeline {
                 script {
                     def changedFiles = getChangedFiles()
                     env.CHANGED_SERVICES = changedFiles.collect { 
-                        // Giả sử service là thư mục chứa pom.xml
+                        // Sử dụng hàm findServiceDir đã sửa đổi
                         findServiceDir(it) 
                     }.unique().join(',')
                 }
@@ -21,17 +21,15 @@ pipeline {
                     def services = env.CHANGED_SERVICES.split(',') as List
                     def parallelBuilds = [:]
                     
-                    // Bước 1: Chạy test và generate report cho từng service
                     services.each { service ->
                         parallelBuilds[service] = {
                             dir(service) {
-                                sh 'mvn clean verify -pl . -am' // Báo cáo Jacoco được tạo tại target/site/jacoco
+                                sh 'mvn clean verify -pl . -am'
                             }
                         }
                     }
                     parallel parallelBuilds
                     
-                    // Bước 2: Tổng hợp tất cả report sau khi chạy song song
                     recordCoverage(
                         tools: [[parser: 'JACOCO']],
                         sourceFileResolver: [[projectDir: "$WORKSPACE"]], 
@@ -43,19 +41,27 @@ pipeline {
     }
 }
 
-// Hàm helper tìm service từ file thay đổi
+// Hàm helper tìm service dir bằng string manipulation và fileExists
 def findServiceDir(String filePath) {
-    def path = new File(filePath)
-    while (path != null) {
-        if (new File(path, "pom.xml").exists()) {
-            return path.toString()
+    def currentPath = filePath
+    while (true) {
+        // Kiểm tra pom.xml trong thư mục hiện tại
+        if (fileExists("${currentPath}/pom.xml")) {
+            return currentPath
         }
-        path = path.parentFile
+        // Di chuyển lên thư mục cha
+        int lastSlash = currentPath.lastIndexOf('/')
+        if (lastSlash == -1) break
+        currentPath = currentPath.substring(0, lastSlash)
+    }
+    // Kiểm tra thư mục gốc
+    if (fileExists("pom.xml")) {
+        return ""
     }
     return null
 }
 
-// Hàm helper lấy danh sách file thay đổi
+// Hàm helper lấy danh sách file thay đổi (giữ nguyên)
 def getChangedFiles() {
     def changedFiles = []
     currentBuild.changeSets.each { changeSet ->

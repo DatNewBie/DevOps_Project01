@@ -1,16 +1,31 @@
 pipeline {
     agent any
-    
+
     stages {
-        stage('Build') {
-            steps {
-                echo 'Building...'
-            }
-        }
         stage('Test') {
             steps {
-                echo 'Testing...'
+                script {
+                    sh 'mvn clean verify'
+
+                    recordCoverage(tools: [[parser: 'JACOCO']])
+                }
             }
+        }
+
+        stage('Build') {
+            steps {
+                script {
+                    sh 'mvn package'
+                    archiveArtifacts '**/target/*.jar'
+
+                }
+            }
+        }
+    }
+
+    post {
+        always {
+            cleanWs()
         }
     }
 }
